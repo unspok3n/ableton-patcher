@@ -190,7 +190,6 @@ func installationSelector() []ableton.Installation {
 		LogFatalError("find installations", err)
 	}
 
-	installations = append(installations, ableton.Installation{Path: "", Name: "Custom"})
 	installationsLen := len(installations)
 
 	for i, installation := range installations {
@@ -203,7 +202,7 @@ func installationSelector() []ableton.Installation {
 
 	var selectedInsts []ableton.Installation
 	for {
-		fmt.Print("Enter the installation number(s): ")
+		fmt.Print("Choose the number of installation(if multipule, separate by space): ")
 		input := GetLine()
 		requestedInsts := strings.Split(input, " ")
 		for _, result := range requestedInsts {

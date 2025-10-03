@@ -1,12 +1,14 @@
 package ableton
 
 import (
-	"github.com/charlievieth/fastwalk"
+	"bufio"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/charlievieth/fastwalk"
 )
 
 const (
@@ -26,14 +28,41 @@ type InstallationData struct {
 
 var fwConfig = &fastwalk.Config{}
 
+// promptForInstallDir prompts the user for the installation directory of Ableton Live.
+func promptForInstallDir(defaultDir string) (string, error) {
+	if _, statErr := os.Stat(defaultDir); !os.IsNotExist(statErr) {
+		return defaultDir, nil
+	}
+
+	// defaultDir not found, prompt user for input
+	println("Default path \""+defaultDir+"\" not found, please enter the path to your Ableton Live installation directory:")
+	reader := bufio.NewReader(os.Stdin)
+	line, readErr := reader.ReadString('\n')
+	if readErr != nil {
+		return "", readErr
+	}
+
+	inputDir := strings.TrimSpace(line)
+	if _, statErr := os.Stat(inputDir); os.IsNotExist(statErr) {
+		return "", os.ErrNotExist
+	}
+
+	return inputDir, nil
+}
+
 func FindInstallations() ([]Installation, error) {
 	var installations []Installation
 
 	var err error
 	switch runtime.GOOS {
 	case "windows":
+		installDir, err := promptForInstallDir(defaultInstallDirWindows)
+		if err != nil {
+			return installations, err
+		}
+
 		err = fastwalk.Walk(fwConfig,
-			defaultInstallDirWindows, func(path string, info fs.DirEntry, err error) error {
+			installDir, func(path string, info fs.DirEntry, err error) error {
 				if err != nil {
 					return nil
 				}
@@ -60,7 +89,12 @@ func FindInstallations() ([]Installation, error) {
 				return nil
 			})
 	case "darwin":
-		err = fastwalk.Walk(fwConfig, defaultInstallDirDarwin, func(path string, info fs.DirEntry, err error) error {
+		installDir, err := promptForInstallDir(defaultInstallDirDarwin)
+		if err != nil {
+			return installations, err
+		}
+
+		err = fastwalk.Walk(fwConfig, installDir, func(path string, info fs.DirEntry, err error) error {
 			if err != nil {
 				return nil
 			}

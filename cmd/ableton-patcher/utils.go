@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 )
 
 func LogFatalError(caller string, err error) {
 	message := fmt.Sprintf("%s: %s", caller, err.Error())
 	fmt.Println(message)
+	debug.PrintStack()
 	Shutdown()
 }
 
@@ -75,7 +77,7 @@ func ClearScreen() {
 }
 
 func Pause() {
-	fmt.Println("\n\nPress enter to continue")
+	fmt.Println("\n\nPress enter to continue (or Ctrl+C to exit)")
 	fmt.Scanln()
 	ClearScreen()
 }

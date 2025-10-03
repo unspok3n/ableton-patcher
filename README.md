@@ -10,6 +10,7 @@ Setup
 
 2. Run and select the desired option:
     - Patch - replaces the `original_public_key` with the public key from the `private_key`
+        if not found in default path, you need to input the **root installation path** manually
     - Unpatch - replaces the public key from the `private_key` with the `original_public_key`
     - Deauthorize - removes `Unlock.json` for the selected Live installation
     - Generate license - creates an authorize file using the `private_key` based on the provided HWID
