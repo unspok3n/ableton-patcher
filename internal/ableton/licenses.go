@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func GenerateLicense(privateKey dsa.PrivateKey, hwid string, edition, version int) ([]string, error) {
+func GenerateLicense(privateKey dsa.PrivateKey, hwid string, edition, version int, addonsLimit int) ([]string, error) {
 	var results []string
 
 	l1, err := generateLicenseSingle(privateKey, hwid, edition, version<<4)
@@ -16,7 +16,7 @@ func GenerateLicense(privateKey dsa.PrivateKey, hwid string, edition, version in
 	}
 	results = append(results, *l1)
 
-	for i := 0x40; i <= 0xFF; i++ {
+	for i := 0x40; i <= addonsLimit; i++ {
 		l2, err := generateLicenseSingle(privateKey, hwid, i, 0x10)
 		if err != nil {
 			return nil, fmt.Errorf("generate license [%d]: %v", i, err)

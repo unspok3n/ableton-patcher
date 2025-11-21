@@ -40,7 +40,9 @@ func (app *application) deauthorize() {
 
 	for i, data := range selectedInstsData {
 		unlockFile := filepath.Join(data.Path, "/Unlock/Unlock.json")
+		unlockFileLegacy := filepath.Join(data.Path, "/Unlock/Unlock.cfg")
 		os.Remove(unlockFile)
+		os.Remove(unlockFileLegacy)
 		fmt.Printf("Deauthorized (%s)", data.Name)
 		if i != len(selectedInstsData)-1 {
 			fmt.Print("\n")
@@ -61,6 +63,7 @@ func (app *application) licenseGenerator() {
 
 	var edition int
 	var editionName string
+	addonsLimit := 0xFF
 	fmt.Print("1. Suite\n2. Standard\n3. Intro\n4. Lite")
 	for {
 		fmt.Print("\nSelect edition: ")
@@ -72,6 +75,9 @@ func (app *application) licenseGenerator() {
 		case "2":
 			edition = 0
 			editionName = "Standard"
+			if versionInt < 12 {
+				addonsLimit = 0xB3
+			}
 		case "3":
 			edition = 3
 			editionName = "Intro"
@@ -84,8 +90,7 @@ func (app *application) licenseGenerator() {
 		}
 		break
 	}
-
-	license, err := ableton.GenerateLicense(*app.key, hwid, edition, versionInt)
+	license, err := ableton.GenerateLicense(*app.key, hwid, edition, versionInt, addonsLimit)
 	if err != nil {
 		LogFatalError("generate license", err)
 	}
