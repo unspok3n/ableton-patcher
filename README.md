@@ -21,3 +21,5 @@ The config file (`ableton-patcher-config.yml`) is not required for running but c
 |-----------------------|----------------------------|-----------------------------|
 | `private_key`         | DER-encoded DSA key pair   | *R2R Team Key*              |
 | `original_public_key` | DER-encoded DSA public key | *Original Ableton Live Key* |
+
+Note: on MacOS (tested on m1, 26.0), you will have to run `codesign --force --deep --sign - /Applications/Ableton\ Live\ 12\ Suite.app/` after patching, replacing 12 and Suite with your local version. Otherwise, the app will crash at launch, returning a codesigning error in the report.
