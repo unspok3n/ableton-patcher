@@ -180,7 +180,7 @@ func (app *application) patcher(reverse bool) {
 				LogFatalError("write file", err)
 			}
 
-			fmt.Printf("Patch/Unpatch applied succesfully (%s)", installation.Path)
+			fmt.Printf("Patch/Unpatch applied successfully (%s)", installation.Path)
 		}
 
 		if i != len(selectedInsts)-1 {
