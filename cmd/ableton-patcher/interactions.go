@@ -5,7 +5,9 @@ import (
 	"crypto/rand"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"unspok3n/ableton-patcher/internal/ableton"
@@ -181,6 +183,27 @@ func (app *application) patcher(reverse bool) {
 			}
 
 			fmt.Printf("Patch/Unpatch applied successfully (%s)", installation.Path)
+
+			if runtime.GOOS == "darwin" {
+				fmt.Print("\n\nNote: you won't be able run the app without re-signing it after patching/unpatching unless you have SIP disabled")
+				fmt.Print("\nSign bundle (you'll be prompted for your sudo password)? (y/n): ")
+				answer := GetLine()
+				if answer == "y" {
+					bundlePath := strings.TrimSuffix(installation.Path, "/Contents/MacOS/Live")
+
+					cmd := exec.Command("sudo", "xattr", "-rd", "com.apple.quarantine", bundlePath)
+					if err = cmd.Run(); err != nil {
+						LogFatalError("sign bundle: remove quarantine flag", err)
+					}
+
+					cmd = exec.Command("codesign", "--force", "--sign", "-", bundlePath)
+					if err := cmd.Run(); err != nil {
+						LogFatalError("sign bundle: codesign", err)
+					}
+
+					fmt.Printf("Bundle signed successfully (%s)", bundlePath)
+				}
+			}
 		}
 
 		if i != len(selectedInsts)-1 {
